@@ -7,9 +7,9 @@ namespace TwitchBot
     {
         static void Main(string[] args)
         {
-            string botName = "zaqv_";
-            string OAuthPass = "oauth:abv4cfhqmvvxhv4s5y61gw7jsql4kb";
-            string channelName = "vqas_";
+            string botName = ""; // Twitch bot name
+            string OAuthPass = ""; // OAuthPass to bot
+            string channelName = ""; // Channel that your bot will connect to 
 
             IrcClient client = new IrcClient("irc.twitch.tv", 6667, botName, OAuthPass, channelName);
 
@@ -17,7 +17,7 @@ namespace TwitchBot
             var pinger = new Pinger(client);
             pinger.Start();
 
-            // Twitch chat commands
+            // Twitch chat commands 
             ChatCommands commands = new ChatCommands();
             commands.SetupCommands();
 
@@ -27,9 +27,9 @@ namespace TwitchBot
             {
                 Console.WriteLine("Reading message");
                 message = client.ReadMessage();
-                Console.WriteLine($"{message}");
                 if(message != null)
                 {
+                    Console.WriteLine($"{message}");
                     // Get the exact text that user entered to the chat witout irc commands
                     message = commands.GetChatCommend(message);
 

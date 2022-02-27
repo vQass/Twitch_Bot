@@ -9,20 +9,20 @@ namespace TwitchBot
         // To add new command:
         // 1. Add command to the dictionary (!commandName, message content)
         // - for example: commands.Add("!help", "Available commands: <!help!>");
-        // 2. Add <!aliasName!> to array called functions
+        // 2. Add <!aliasName!> to array called functionTags
         // 3. Create new method for the command
         // 4. Add delegate with specific alias to dictionary
-        // - for example: functionsOneArg.Add("<!help!>", new Func<string, string>(HelpCommand));
+        // - for example: functionDictionaries.Add("<!help!>", new Func<string, string>(HelpCommand));
 
-        Dictionary<string, Delegate> functionsOneArg;
+        Dictionary<string, Delegate> functionDictionaries;
 
         Dictionary<string, string> commands;
 
-        string[] functions = { "<!help!>", "<!dice!>", "<!percent!>", "<!random!>" };
+        string[] functionTags = { "<!help!>", "<!dice!>", "<!percent!>", "<!random!>" };
 
         public void SetupCommands()
         {
-            functionsOneArg = new Dictionary<string, Delegate>();
+            functionDictionaries = new Dictionary<string, Delegate>();
 
             commands = new Dictionary<string, string>();
 
@@ -31,10 +31,10 @@ namespace TwitchBot
             commands.Add("!percentExample", "Your luck today: <!percent!>");
             commands.Add("!randomExample", "Your random number: <!random!><!-4_21!>");
 
-            functionsOneArg.Add("<!help!>", new Func<string, string>(HelpCommand));
-            functionsOneArg.Add("<!dice!>", new Func<string, string>(DiceCommand));
-            functionsOneArg.Add("<!percent!>", new Func<string, string>(PercentCommand));
-            functionsOneArg.Add("<!random!>", new Func<string, string>(RandomNumberCommand));
+            functionDictionaries.Add("<!help!>", new Func<string, string>(HelpCommand));
+            functionDictionaries.Add("<!dice!>", new Func<string, string>(DiceCommand));
+            functionDictionaries.Add("<!percent!>", new Func<string, string>(PercentCommand));
+            functionDictionaries.Add("<!random!>", new Func<string, string>(RandomNumberCommand));
         }
 
         public string GetChatCommend(string message)
@@ -49,16 +49,18 @@ namespace TwitchBot
                 if (command.Key == message)
                 {
                     string commandMessage = command.Value;
-                    for (int i = 0; i < functions.Length; i++)
+                    for (int i = 0; i < functionTags.Length; i++)
                     {
-                        if (commandMessage.Contains(functions[i]))
+                        if (!commandMessage.Contains(functionTags[i]))
                         {
-                            if (functionsOneArg.ContainsKey(functions[i]))
-                            {
-                                commandMessage = functionsOneArg[functions[i]].DynamicInvoke(commandMessage).ToString();
-                            }
-                            i--;
+                            continue;
                         }
+                        if (!functionDictionaries.ContainsKey(functionTags[i])) // Making sure dicionary contais the function tag
+                        {
+                            continue;
+                        }
+                        commandMessage = functionDictionaries[functionTags[i]].DynamicInvoke(commandMessage).ToString();
+                        i--;
                     }
                     Console.WriteLine(commandMessage);
                     return commandMessage;
@@ -110,7 +112,7 @@ namespace TwitchBot
 
                 int lowerBound, upperBound;
                 // 
-                if(    arr.Length != 2
+                if (arr.Length != 2
                     || !int.TryParse(arr[0], out lowerBound)
                     || !int.TryParse(arr[1], out upperBound)
                     || upperBound < lowerBound)
